@@ -1,16 +1,17 @@
-#include <Arduino.h>
+#include <ESPWifi.hpp>
 
-const int btn_start = 13;
-const int btn_stop = 12;
-const int led_green = 14;
-const int led_red = 27;
-// const int potentiometer = 26;
-// const int motor = 25;
+const byte BTN_START = 13;
+const byte BTN_STOP = 12;
+const byte LED_GREEN = 14;
+const byte LED_RED = 27;
+const byte POTENTIOMETER = 26;
+const byte MOTOR = 25;
 
 
 void setup(){
-    
 
+
+}
 
 void loop(){
 
