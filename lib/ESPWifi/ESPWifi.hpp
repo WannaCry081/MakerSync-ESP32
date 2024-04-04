@@ -12,6 +12,8 @@
 class ESPWifi {
     public:
         ESPWifi(const String ssid, const String password);
+        bool isConnect();
+
 };
 
 
