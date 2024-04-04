@@ -10,6 +10,9 @@
 
 
 class ESPWifi {
+    private:
+        int _counter = 0;
+        
     public:
         ESPWifi(const String& ssid, const String& password);
         bool isConnect();
