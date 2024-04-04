@@ -1,5 +1,5 @@
+#include <Arduino.h>
 #include <ESPWifi.hpp>
-
 
 const String WIFI_SSID = "";
 const String WIFI_PASSWORD = "";
@@ -11,10 +11,12 @@ const byte LED_RED = 27;
 const byte POTENTIOMETER = 26;
 const byte MOTOR = 25;
 
+int state = 0;
+
 
 ESPWifi wifi(WIFI_SSID, WIFI_PASSWORD);
 
-
+void emergencyStop();
 void setup(){
 
     Serial.begin(115200);
@@ -32,7 +34,18 @@ void setup(){
     if (wifi.isConnect()){
         Serial.printf("\nSuccessfully Connected to %s\n", WIFI_SSID);
         wifi.displayStatus();
+
+        pinMode(LED_GREEN, OUTPUT);
+        pinMode(LED_RED, OUTPUT);
+        pinMode(BTN_START, INPUT_PULLUP);
+        pinMode(BTN_STOP, INPUT_PULLUP);
     }
+
+    attachInterrupt(
+        digitalPinToInterrupt(BTN_STOP), 
+        emergencyStop,
+        FALLING 
+    );
 }
 
 void loop(){
@@ -41,6 +54,34 @@ void loop(){
         return;
     }
 
-    
+    if ((state == 0) && (digitalRead(BTN_START) == LOW)){
+        state = 1;
+        digitalWrite(LED_GREEN, HIGH);
+    }
 
+    if (state == 1) {
+
+        int value = map(
+            analogRead(POTENTIOMETER),
+            0, 4095, 
+            0, 255
+        );
+
+        analogWrite(MOTOR, value);
+    } 
+
+    if (state == -1){
+        analogWrite(MOTOR, 0);
+        digitalWrite(LED_GREEN, LOW);
+        digitalWrite(LED_RED, HIGH);
+        delay(5000);
+        digitalWrite(LED_RED, LOW);
+        delay(5000);
+
+        state = 0;
+    }
+}
+
+void emergencyStop() {
+    state = -1;
 }
