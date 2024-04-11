@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <ESPWifi.hpp>
+#include <max6675.h>
 
 
 const String WIFI_SSID = "";
@@ -11,6 +12,9 @@ const byte LED_GREEN = 14;
 const byte LED_RED = 27;
 const byte POTENTIOMETER = 26;
 const byte MOTOR = 25;
+const byte SCK_PIN = 14;
+const byte CS_PIN = 27;
+const byte SO_PIN = 26;
 
 int state = 0;
 
