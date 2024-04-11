@@ -18,8 +18,7 @@ const byte SO_PIN = 26;
 
 int state = 0;
 
-
-ESPWifi wifi(WIFI_SSID, WIFI_PASSWORD);
+MAX6675 thermo(SCK_PIN, CS_PIN, SO_PIN);
 
 void emergencyStop();
 void setup(){
