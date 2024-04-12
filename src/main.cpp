@@ -3,25 +3,35 @@
 #include <max6675.h>
 
 
+const String WIFI_SSID = "";
+const String WIFI_PASSWORD = "";
+
+const byte LED_RED = 13;
+const byte LED_GREEN = 12;
+
 const byte BTN_START = 19;
 const byte BTN_STOP = 5;
-const byte LED_GREEN = 12;
-const byte LED_RED = 13;
 const byte POTENTIOMETER = 35;
+
 const byte MOTOR = 25;
+
 const byte SCK_PIN = 14;
 const byte CS_PIN = 27;
 const byte SO_PIN = 26;
 
-int state = 0;
+String state = "null";
 
 MAX6675 thermo(SCK_PIN, CS_PIN, SO_PIN);
 
+
 void emergencyStop();
+
+
 void setup(){
 
     Serial.begin(115200);
 
+    ESPWifi wifi(WIFI_SSID, WIFI_PASSWORD);
     Serial.printf("Connecting to %s", WIFI_SSID);
     while (!wifi.isConnect()) {
         Serial.print(".");
@@ -38,6 +48,7 @@ void setup(){
 
         pinMode(LED_GREEN, OUTPUT);
         pinMode(LED_RED, OUTPUT);
+        pinMode(MOTOR, OUTPUT);
         pinMode(BTN_START, INPUT_PULLUP);
         pinMode(BTN_STOP, INPUT_PULLUP);
     }
@@ -51,38 +62,34 @@ void setup(){
 
 void loop(){
 
-    if (!wifi.isConnect()){
-        return;
-    }
+    int value = map(
+        analogRead(POTENTIOMETER),
+        0, 4095, 0, 255
+    );
 
-    if ((state == 0) && (digitalRead(BTN_START) == LOW)){
-        state = 1;
-        digitalWrite(LED_GREEN, HIGH);
-    }
+    if (WiFi.status() != WL_CONNECTED) return;
 
-    if (state == 1) {
-
-        int value = map(
-            analogRead(POTENTIOMETER),
-            0, 4095, 
-            0, 255
-        );
-
-        analogWrite(MOTOR, value);
-    } 
-
-    if (state == -1){
+    if (state.equals("stop")){
         analogWrite(MOTOR, 0);
         digitalWrite(LED_GREEN, LOW);
         digitalWrite(LED_RED, HIGH);
-        delay(5000);
+        delay(3000);
         digitalWrite(LED_RED, LOW);
-        delay(5000);
+        state = "null";
+    }    
 
-        state = 0;
+    if ((state.equals("null")) && 
+        (digitalRead(BTN_START) == LOW)){
+        digitalWrite(LED_GREEN, HIGH);
+        state = "start";
     }
+
+    if (state.equals("start")) {
+        analogWrite(MOTOR, value);
+        // thermo.readCelsius();
+    } 
 }
 
 void emergencyStop() {
-    state = -1;
+    state = "stop";
 }
