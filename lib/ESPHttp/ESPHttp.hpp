@@ -24,8 +24,8 @@ class ESPHttp {
 
     public:
         Sensor retrieveSensors(String sensor_id);     
-        void createSensors(String sensor_id);
-        void updateSensors(String sensor_id, Sensor sensor);  
+        bool createSensors(String sensor_id);
+        bool updateSensors(String sensor_id, Sensor sensor);  
 };
 
 
