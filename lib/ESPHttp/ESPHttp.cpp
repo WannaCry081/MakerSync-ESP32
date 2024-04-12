@@ -45,6 +45,6 @@ bool ESPHttp::createSensors(String sensor_id) {
 }
 
 
-void ESPHttp::updateSensors(String sensor_id, Sensor sensor) {
+bool ESPHttp::updateSensors(String sensor_id, Sensor sensor) {
 
 }  
