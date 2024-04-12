@@ -8,9 +8,9 @@
 
 
 typedef struct {
-    boolean is_start; 
-    boolean is_stop;
-    boolean is_initialized;
+    bool is_start; 
+    bool is_stop;
+    bool is_initialized;
     int counter;
     int timer; 
     float temperature; 
