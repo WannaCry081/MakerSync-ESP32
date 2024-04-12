@@ -1,7 +1,9 @@
 #include <Arduino.h>
 #include <ESPWifi.hpp>
+#include <ESPHttp.hpp>
 #include <max6675.h>
 
+const String UUID = "2ae09d7a-8f5d-496f-9917-4deabb3e5ad3";
 
 
 const String WIFI_SSID = "";
@@ -23,7 +25,7 @@ const byte SO_PIN = 26;
 String state = "null";
 
 MAX6675 thermo(SCK_PIN, CS_PIN, SO_PIN);
-
+ESPHttp http(UUID);
 
 void emergencyStop();
 
@@ -46,6 +48,12 @@ void setup(){
     if (wifi.isConnect()){
         Serial.printf("\nSuccessfully Connected to %s\n", WIFI_SSID);
         wifi.displayStatus();
+
+        if (http.createSensors()) {
+            Serial.println("Successfully created machine instance.");
+        } else {
+            Serial.println("Duplicate machine instance.");
+        }
 
         pinMode(LED_GREEN, OUTPUT);
         pinMode(LED_RED, OUTPUT);
