@@ -5,8 +5,8 @@ Sensor ESPHttp::retrieveSensors(String sensor_id) {
     Sensor sensor;
     HTTPClient http;
 
-    String url = _sensors_url + sensor_id;
-    http.begin(url);
+    String endpoint = _sensors_url + sensor_id;
+    http.begin(endpoint);
 
     int httpCode = http.GET();
 
