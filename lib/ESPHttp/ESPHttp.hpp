@@ -22,7 +22,8 @@ class ESPHttp {
         String _base_url = "https://maker-sync-django.vercel.app/api/v1/";
 
     public:
-        Sensor retrieveSensors(String sensor_id);       
+        Sensor retrieveSensors(String sensor_id);     
+        void createSensors(String sensor_id);
 };
 
 
