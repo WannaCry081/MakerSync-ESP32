@@ -48,16 +48,15 @@ void setup(){
 
         pinMode(LED_GREEN, OUTPUT);
         pinMode(LED_RED, OUTPUT);
-        pinMode(MOTOR, OUTPUT);
         pinMode(BTN_START, INPUT_PULLUP);
         pinMode(BTN_STOP, INPUT_PULLUP);
-    }
 
-    attachInterrupt(
-        digitalPinToInterrupt(BTN_STOP), 
-        emergencyStop,
-        FALLING 
-    );
+        attachInterrupt(
+            digitalPinToInterrupt(BTN_STOP), 
+            emergencyStop,
+            FALLING 
+        );
+    }
 }
 
 void loop(){
@@ -85,8 +84,10 @@ void loop(){
     }
 
     if (state.equals("start")) {
+        Serial.flush();
         analogWrite(MOTOR, value);
         // thermo.readCelsius();
+        delay(10);
     } 
 }
 
