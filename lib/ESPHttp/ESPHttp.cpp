@@ -29,8 +29,19 @@ Sensor ESPHttp::retrieveSensors(String sensor_id) {
 }   
 
 
-void ESPHttp::createSensors(String sensor_id) {
+bool ESPHttp::createSensors(String sensor_id) {
+    HTTPClient http;
 
+    String endpoint = _sensors_url + sensor_id;
+    http.addHeader("Content-Type", "application/json");
+
+    http.begin(endpoint);
+
+    int httpResponseCode = http.POST("");
+
+    http.end();
+
+    return (httpResponseCode == 201) ? true : false;
 }
 
 
