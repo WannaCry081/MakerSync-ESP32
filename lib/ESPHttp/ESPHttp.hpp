@@ -23,9 +23,9 @@ class ESPHttp {
         const String _users_url = "https://maker-sync-django.vercel.app/api/v1/users/";
 
     public:
-        Sensor retrieveSensors(String sensor_id);     
-        bool createSensors(String sensor_id);
-        bool updateSensors(String sensor_id, Sensor sensor);  
+        Sensor retrieveSensors();     
+        bool createSensors();
+        bool updateSensors(Sensor sensor);  
 };
 
 
