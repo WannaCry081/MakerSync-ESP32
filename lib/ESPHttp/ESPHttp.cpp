@@ -1,7 +1,12 @@
 #include "ESPHttp.hpp"
 
 
-Sensor ESPHttp::retrieveSensors(String sensor_id) {
+ESPHttp::ESPHttp(const String & uuid) {
+    _uuid = uuid;
+}   
+
+
+Sensor ESPHttp::retrieveSensors() {
     Sensor sensor;
     HTTPClient http;
 
