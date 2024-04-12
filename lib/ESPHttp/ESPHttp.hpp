@@ -7,14 +7,14 @@
 #include <ArduinoJson.h>
 
 
-struct Sensor {
+typedef struct {
     boolean is_start; 
     boolean is_stop;
     boolean is_initialized;
     int counter;
     int timer; 
     float temperature; 
-};
+} Sensor;
 
 
 class ESPHttp {
