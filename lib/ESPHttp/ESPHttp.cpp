@@ -10,7 +10,7 @@ Sensor ESPHttp::retrieveSensors() {
     Sensor sensor;
     HTTPClient http;
 
-    String endpoint = _sensors_url + sensor_id;
+    String endpoint = _sensors_url + _uuid;
     http.begin(endpoint);
 
     int httpCode = http.GET();
@@ -34,10 +34,10 @@ Sensor ESPHttp::retrieveSensors() {
 }   
 
 
-bool ESPHttp::createSensors(String sensor_id) {
+bool ESPHttp::createSensors() {
     HTTPClient http;
 
-    String endpoint = _sensors_url + sensor_id;
+    String endpoint = _sensors_url + _uuid;
     http.addHeader("Content-Type", "application/json");
 
     http.begin(endpoint);
@@ -50,10 +50,10 @@ bool ESPHttp::createSensors(String sensor_id) {
 }
 
 
-bool ESPHttp::updateSensors(String sensor_id, Sensor sensor) {
+bool ESPHttp::updateSensors(Sensor sensor) {
     HTTPClient http;
 
-    String endpoint = _sensors_url + sensor_id;
+    String endpoint = _sensors_url + _uuid;
 
     http.addHeader("Content-Type", "application/json");
 
