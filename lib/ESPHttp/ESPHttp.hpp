@@ -19,10 +19,13 @@ typedef struct {
 
 class ESPHttp {
     private:
+        String _uuid;
+        
         const String _sensors_url = "https://maker-sync-django.vercel.app/api/v1/sensors/";
         const String _users_url = "https://maker-sync-django.vercel.app/api/v1/users/";
 
     public:
+        ESPHttp(const String & uuid);
         Sensor retrieveSensors();     
         bool createSensors();
         bool updateSensors(Sensor sensor);  
