@@ -2,17 +2,19 @@
 #include <ESPWifi.hpp>
 #include <ESPHttp.hpp>
 #include <max6675.h>
+#define START "start"
+#define STOP "stop"
+#define NONE "null"
 
 const String UUID = "2ae09d7a-8f5d-496f-9917-4deabb3e5ad3";
 
-
-const String WIFI_SSID = "";
-const String WIFI_PASSWORD = "";
+const String WIFI_SSID = "Peppa Pig";
+const String WIFI_PASSWORD = "LechonIsBack!2024";
 
 const byte LED_RED = 13;
 const byte LED_GREEN = 12;
 
-const byte BTN_START = 19;
+const byte BTN_START = 18;
 const byte BTN_STOP = 5;
 const byte POTENTIOMETER = 35;
 
@@ -22,12 +24,15 @@ const byte SCK_PIN = 14;
 const byte CS_PIN = 27;
 const byte SO_PIN = 26;
 
-String state = "null";
 
 MAX6675 thermo(SCK_PIN, CS_PIN, SO_PIN);
 ESPHttp http(UUID);
 
-void emergencyStop();
+Sensor sensor;
+String state = NONE;
+
+void stopMachine();
+void startMachine();
 
 
 void setup(){
@@ -59,47 +64,79 @@ void setup(){
         pinMode(LED_RED, OUTPUT);
         pinMode(BTN_START, INPUT_PULLUP);
         pinMode(BTN_STOP, INPUT_PULLUP);
+        pinMode(MOTOR, OUTPUT);
 
         attachInterrupt(
             digitalPinToInterrupt(BTN_STOP), 
-            emergencyStop,
+            stopMachine,
             FALLING 
+        );
+
+        attachInterrupt(
+            digitalPinToInterrupt(BTN_START),
+            startMachine, 
+            FALLING
         );
     }
 }
 
 void loop(){
 
-    int value = map(
-        analogRead(POTENTIOMETER),
-        0, 4095, 0, 255
-    );
-
     if (WiFi.status() != WL_CONNECTED) return;
 
-    if (state.equals("stop")){
+    if ( state.equals(START)) {
+        digitalWrite(LED_GREEN, HIGH);
+
+        while (state.equals(START)) {
+            Serial.flush();
+
+            int value = map(
+                analogRead(POTENTIOMETER),
+                0, 4095, 0, 255
+            );  
+
+            analogWrite(MOTOR, value);
+            sensor.temperature = thermo.readCelsius();
+            delay(10);
+
+            http.updateSensors(sensor);
+            sensor = http.retrieveSensors();
+
+            if (sensor.is_stop) {
+                state = STOP;
+                break;
+            }
+        }
+    }
+
+    if (state.equals(STOP)) {
         analogWrite(MOTOR, 0);
         digitalWrite(LED_GREEN, LOW);
         digitalWrite(LED_RED, HIGH);
-        delay(3000);
+        delay(1500);
         digitalWrite(LED_RED, LOW);
-        state = "null";
-    }    
+        state = NONE; 
 
-    if ((state.equals("null")) && 
-        (digitalRead(BTN_START) == LOW)){
-        digitalWrite(LED_GREEN, HIGH);
-        state = "start";
+        sensor.counter = 0;
+        sensor.timer = 0;
+        sensor.temperature = 0;
+
+        http.updateSensors(sensor);
     }
-
-    if (state.equals("start")) {
-        Serial.flush();
-        analogWrite(MOTOR, value);
-        // thermo.readCelsius();
-        delay(10);
-    } 
 }
 
-void emergencyStop() {
-    state = "stop";
+void stopMachine() {
+    if (state.equals(START)) {
+       state = STOP;
+       sensor.is_stop = true;
+       sensor.is_start = false;
+    }
+}
+
+void startMachine() {
+    if (state.equals(NONE)) {
+        state = START;
+        sensor.is_start = true;
+        sensor.is_stop = false;
+    }
 }
