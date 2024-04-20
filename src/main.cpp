@@ -2,6 +2,8 @@
 #include <ESPWifi.hpp>
 #include <ESPHttp.hpp>
 #include <max6675.h>
+#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
 
 // Define constants
 #define START "start"
@@ -27,6 +29,7 @@ const String WIFI_PASSWORD = "<WIFI PASSWORD>";
 const String UUID = "2ae09d7a-8f5d-496f-9917-4deabb3e5ad3";
 
 // Initialize objects
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 MAX6675 thermo(SCK_PIN, CS_PIN, SO_PIN);
 ESPHttp http(UUID);
 
@@ -40,6 +43,9 @@ void startMachine();
 
 void setup() {
     Serial.begin(115200);
+
+    lcd.init();
+    lcd.backlight();
 
     // Connect to Wi-Fi
     ESPWifi wifi(WIFI_SSID, WIFI_PASSWORD);
