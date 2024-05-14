@@ -17,23 +17,35 @@ Sensor ESPHttp::retrieveSensors() {
     String payload = "{code : " + _uuid + "}";
     int httpCode = http.POST(payload);
     
-    if (httpCode == 200) {
-        String payload = http.getString();
-
-        JsonDocument doc;
-        deserializeJson(doc, payload);
-
-        sensor.is_start = (doc["is_start"].as<JsonInteger>() != 0);
-        sensor.is_stop = (doc["is_stop"].as<JsonInteger>() != 0);
-        sensor.is_initialized = (doc["is_initialized"].as<JsonInteger>() != 0);
-        sensor.counter = doc["counter"].as<JsonInteger>();
-        sensor.timer = doc["timer"].as<JsonInteger>();;
-        sensor.temperature = doc["temperature"].as<JsonFloat>();
-    }
 
     http.end();
     return (httpCode == 201) ? true : false;
 }
+
+Sensor ESPHttp::retrieveSensors() {
+    Sensor sensor;
+    HTTPClient http;
+
+    http.begin(_sensorsUrl);
+    int httpCode = http.GET();
+
+    if (httpCode == 200) {
+        String response = http.getString();
+
+        JsonDocument doc;
+        deserializeJson(doc, response);
+
+        sensor.is_start = (doc["is_start"].as<JsonInteger>() != 0);
+        sensor.is_stop = (doc["is_stop"].as<JsonInteger>() != 0);
+        sensor.is_initialize = (doc["is_initialize"].as<JsonInteger>() != 0);
+        sensor.counter = doc["counter"].as<JsonInteger>();
+        sensor.time = doc["time"].as<JsonInteger>();
+        sensor.temperature = doc["temperature"].as<JsonFloat>();
+    }
+
+    http.end();
+    return sensor;
+}   
 
 
 bool ESPHttp::createSensors() {
