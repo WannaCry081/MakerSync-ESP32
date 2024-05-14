@@ -27,9 +27,14 @@ class ESPHttp {
 
     public:
         ESPHttp(const String & uuid);
-        Sensor retrieveSensors();     
-        bool createSensors();
+
+        bool createMachine(void);
+        
+        Sensor createSensors(void);
+        Sensor retrieveSensors(void);     
         bool updateSensors(Sensor sensor);  
+
+        void createNotifications(String title, String content);
 };
 
 
