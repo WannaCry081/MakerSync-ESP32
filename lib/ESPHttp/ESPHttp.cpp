@@ -85,14 +85,28 @@ bool ESPHttp::updateSensors(Sensor sensor) {
     String payload = "{";
     payload += "\"is_start\":\"" + String(sensor.is_start) + "\", ";
     payload += "\"is_stop\":\"" + String(sensor.is_stop) + "\", ";
-    payload += "\"is_initialized\":\"" + String(sensor.is_initialized) + "\", ";
+    payload += "\"is_initialize\":\"" + String(sensor.is_initialize) + "\", ";
     payload += "\"counter\":\"" + String(sensor.counter) + "\", ";
-    payload += "\"timer\":\"" + String(sensor.timer) + "\", ";
+    payload += "\"time\":\"" + String(sensor.time) + "\", ";
     payload += "\"temperature\":\"" + String(sensor.temperature) + "\"";
     payload += "}";
 
-    http.begin(endpoint);
-    int httpResponseCode = http.PUT(payload);
+    http.begin(_sensorsUrl);
+    int httpCode = http.PUT(payload);
+
+    http.end();
+    return (httpCode == 200) ? true : false;
+}
+
+void ESPHttp::createNotifications(String title, String content) {
+    HTTPClient http;
+
+    http.addHeader("Content-Type", "application/json");
+
+    String payload = "{";
+    payload += "\"is_start\":\"" + title + "\", ";
+    payload += "\"is_stop\":\"" + content + "\" ";
+    payload += "}";
 
     http.end();
     return (httpResponseCode == 200) ? true : false;
