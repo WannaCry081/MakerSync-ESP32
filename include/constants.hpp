@@ -12,5 +12,8 @@ const byte LED_RED = 14;
 const byte LED_YELLOW = 12; 
 const byte LED_GREEN = 13;
 
+// Button pins
+const byte BTN_START = 18;
+const byte BTN_STOP = 19;
 
 #endif
