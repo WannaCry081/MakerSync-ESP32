@@ -47,22 +47,33 @@ Sensor ESPHttp::retrieveSensors() {
     return sensor;
 }   
 
-
-bool ESPHttp::createSensors() {
+Sensor ESPHttp::createSensors(void) {
+    Sensor sensor;
     HTTPClient http;
 
     String endpoint = _sensors_url + _uuid;
     http.addHeader("Content-Type", "application/json");
+    http.begin(_sensorsUrl);
 
-    http.begin(endpoint);
+    int httpCode = http.POST("");
+    
+    if (httpCode == 201) {
+        String response = http.getString();
 
-    int httpResponseCode = http.POST("");
+        JsonDocument doc;
+        deserializeJson(doc, response);
+
+        sensor.is_start = (doc["is_start"].as<JsonInteger>() != 0);
+        sensor.is_stop = (doc["is_stop"].as<JsonInteger>() != 0);
+        sensor.is_initialize = (doc["is_initialize"].as<JsonInteger>() != 0);
+        sensor.counter = doc["counter"].as<JsonInteger>();
+        sensor.time = doc["time"].as<JsonInteger>();
+        sensor.temperature = doc["temperature"].as<JsonFloat>();
+    }
 
     http.end();
-
-    return (httpResponseCode == 201) ? true : false;
+    return sensor;
 }
-
 
 bool ESPHttp::updateSensors(Sensor sensor) {
     HTTPClient http;
