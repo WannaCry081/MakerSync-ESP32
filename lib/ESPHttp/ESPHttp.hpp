@@ -10,9 +10,9 @@
 typedef struct {
     bool is_start; 
     bool is_stop;
-    bool is_initialized;
+    bool is_initialize;
     int counter;
-    int timer; 
+    int time; 
     float temperature; 
 } Sensor;
 
