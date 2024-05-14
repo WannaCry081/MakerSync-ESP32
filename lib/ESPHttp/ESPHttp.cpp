@@ -5,16 +5,18 @@ ESPHttp::ESPHttp(const String & uuid) {
     _uuid = uuid;
 }   
 
+bool ESPHttp::createMachine(void) {
 
 Sensor ESPHttp::retrieveSensors() {
     Sensor sensor;
     HTTPClient http;
 
-    String endpoint = _sensors_url + _uuid;
-    http.begin(endpoint);
+    http.addHeader("Content-Type", "application/json");
+    http.begin(_machinesUrl);
 
-    int httpCode = http.GET();
-
+    String payload = "{code : " + _uuid + "}";
+    int httpCode = http.POST(payload);
+    
     if (httpCode == 200) {
         String payload = http.getString();
 
@@ -30,8 +32,8 @@ Sensor ESPHttp::retrieveSensors() {
     }
 
     http.end();
-    return sensor;
-}   
+    return (httpCode == 201) ? true : false;
+}
 
 
 bool ESPHttp::createSensors() {
