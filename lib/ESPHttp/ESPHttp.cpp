@@ -7,7 +7,6 @@ ESPHttp::ESPHttp(const String & uuid) {
 
 bool ESPHttp::createMachine(void) {
 
-Sensor ESPHttp::retrieveSensors() {
     Sensor sensor;
     HTTPClient http;
 
@@ -51,7 +50,6 @@ Sensor ESPHttp::createSensors(void) {
     Sensor sensor;
     HTTPClient http;
 
-    String endpoint = _sensors_url + _uuid;
     http.addHeader("Content-Type", "application/json");
     http.begin(_sensorsUrl);
 
@@ -77,8 +75,6 @@ Sensor ESPHttp::createSensors(void) {
 
 bool ESPHttp::updateSensors(Sensor sensor) {
     HTTPClient http;
-
-    String endpoint = _sensors_url + _uuid;
 
     http.addHeader("Content-Type", "application/json");
 
@@ -108,6 +104,7 @@ void ESPHttp::createNotifications(String title, String content) {
     payload += "\"is_stop\":\"" + content + "\" ";
     payload += "}";
 
+    http.begin(_notificationsUrl);
+    http.POST(payload);
     http.end();
-    return (httpResponseCode == 200) ? true : false;
-}  
+}
