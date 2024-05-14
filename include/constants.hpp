@@ -21,4 +21,7 @@ const byte SCK_PIN = 27;
 const byte CS_PIN = 26;
 const byte SO_PIN = 25;
 
+// Relay module pin
+const byte RELAY_MODULE = 33;
+
 #endif
