@@ -3,6 +3,8 @@
 
 ESPHttp::ESPHttp(const String & uuid) {
     _uuid = uuid;
+    _sensorsUrl = _machinesUrl + "/" + uuid + "/sensors";
+    _notificationsUrl = _machinesUrl + "/" + uuid + "/notifications";
 }   
 
 bool ESPHttp::createMachine(void) {
