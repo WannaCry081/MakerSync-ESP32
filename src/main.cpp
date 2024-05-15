@@ -1,9 +1,5 @@
 #include <Arduino.h>
-#include <ESPWifi.hpp>
-#include <ESPHttp.hpp>
-#include <max6675.h>
-#include <LiquidCrystal_I2C.h>
-#include <Wire.h>
+#include "constants.hpp"
 
 // Define constants
 #define START "start"
@@ -41,6 +37,7 @@ String state = NONE;
 // Function prototypes
 void stopMachine();
 void startMachine();
+void stopMachine();
 
 void setup() {
     Serial.begin(115200);
@@ -173,10 +170,8 @@ void stopMachine() {
     }
 }
 
-// Interrupt service routine for start button
+
 void startMachine() {
-    if (state.equals(NONE) && sensor.is_start && sensor.is_initialized) {
-        state = START;
-        sensor.is_stop = false;
-    }
+    if (sensor.is_initialize && sensor.is_start)
+        machine_state = START;
 }
