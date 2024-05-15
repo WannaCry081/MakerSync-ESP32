@@ -42,58 +42,48 @@ void stopMachine();
 void setup() {
     Serial.begin(115200);
 
-    lcd.init();
-    lcd.backlight();
-
-    // Connect to Wi-Fi
     ESPWifi wifi(WIFI_SSID, WIFI_PASSWORD);
-    Serial.printf("Connecting to %s", WIFI_SSID);
+    Serial.printf("Connecting to %s...", WIFI_SSID);
     while (!wifi.isConnect()) {
         Serial.print(".");
         delay(1000);
 
         if (!wifi.isSuccess()) {
-            Serial.printf("\nError! Failed to Connect to %s.\n", WIFI_SSID);
+            Serial.printf("\nError connecting to %s...\n", WIFI_SSID);
         }
     }
 
     if (wifi.isConnect()) {
-        Serial.printf("\nSuccessfully Connected to %s\n", WIFI_SSID);
-        wifi.displayStatus();
 
-        // Create machine instance
-        if (http.createSensors()) {
-            Serial.println("Successfully created machine instance.");
+        if (http.createMachine()){
+            sensor = http.createSensors();
+            Serial.println("\nSuccessfully created machine instance...\n");
         } else {
-            Serial.println("Duplicate machine instance.");
+            Serial.println("\nDuplicate instance of machine...\n");
         }
 
-        // Initialize pin modes
+        pinMode(BTN_START, INPUT_PULLUP);
+        pinMode(BTN_STOP, INPUT_PULLUP);
+
         pinMode(LED_GREEN, OUTPUT);
         pinMode(LED_YELLOW, OUTPUT);
         pinMode(LED_RED, OUTPUT);
-        pinMode(BTN_START, INPUT_PULLUP);
-        pinMode(BTN_STOP, INPUT_PULLUP);
-        pinMode(MOTOR, OUTPUT);
+        pinMode(RELAY_MODULE, OUTPUT);
 
-        // Turn off LEDs
-        digitalWrite(LED_GREEN, HIGH);
-        digitalWrite(LED_YELLOW, HIGH);
-        digitalWrite(LED_RED, HIGH);
-        delay(1800);
+        attachInterrupt(digitalPinToInterrupt(BTN_START), 
+            startMachine, RISING);
 
-        digitalWrite(LED_GREEN, LOW);
-        digitalWrite(LED_YELLOW, LOW);
-        digitalWrite(LED_RED, LOW);
+        attachInterrupt(digitalPinToInterrupt(BTN_STOP), 
+            stopMachine, RISING);
 
-        // Attach interrupts
-        attachInterrupt(
-            digitalPinToInterrupt(BTN_STOP), 
-            stopMachine, FALLING);
-        attachInterrupt(
-            digitalPinToInterrupt(BTN_START), 
-            startMachine, FALLING);    
-    }    
+        sensor.is_start = false;
+        sensor.is_initialize = false;
+        sensor.is_stop = false;
+        sensor.counter = 0;
+        sensor.time = 0;       
+
+        digitalWrite(RELAY_MODULE, LOW); 
+    }   
 }
 
 void loop() {
