@@ -22,9 +22,9 @@ class ESPHttp {
         String _uuid;
         
         const String _machinesUrl = "https://maker-sync-django.vercel.app/api/v2/machines";
-        const String _sensorsUrl = _machinesUrl + _uuid + "/sensors";
-        const String _notificationsUrl = _machinesUrl + _uuid + "/notifications";
-
+        String _sensorsUrl;
+        String _notificationsUrl;
+        
     public:
         ESPHttp(const String & uuid);
 

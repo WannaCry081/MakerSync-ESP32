@@ -40,4 +40,7 @@ const byte SO_PIN = 25;
 // Relay module pin
 const byte RELAY_MODULE = 33;
 
+ESPHttp http(UUID);
+MAX6675 thermo(SCK_PIN, CS_PIN, SO_PIN);
+
 #endif
