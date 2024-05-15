@@ -3,6 +3,18 @@
 
 
 #include <Arduino.h>
+#include <Wire.h>
+#include <max6675.h>
+
+#include <ESPWifi.hpp>
+#include <ESPHttp.hpp>
+
+#define STOP "stop"
+#define START "start"
+#define NONE "null"
+
+Sensor sensor;
+String machine_state = NONE;
 
 // Machine UUID
 const String UUID = "2ae09d7a-8f5d-496f-9917-4deabb3e5ad3";
