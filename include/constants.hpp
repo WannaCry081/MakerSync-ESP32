@@ -29,8 +29,8 @@ const byte LED_YELLOW = 12;
 const byte LED_GREEN = 13;
 
 // Button pins
-const byte BTN_START = 18;
-const byte BTN_STOP = 19;
+const byte BTN_START = 19;
+const byte BTN_STOP = 18;
 
 // Thermocouple pin
 const byte SCK_PIN = 27;
