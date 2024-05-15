@@ -175,3 +175,8 @@ void startMachine() {
     if (sensor.is_initialize && sensor.is_start)
         machine_state = START;
 }
+
+void stopMachine() {
+    if (sensor.is_initialize && sensor.is_start)
+        machine_state = STOP;
+}
