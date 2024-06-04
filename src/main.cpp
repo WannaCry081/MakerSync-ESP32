@@ -1,35 +1,42 @@
 #include <Arduino.h>
-#include "constants.hpp"
+#include <ESPScreen.hpp>
+#include "const.hpp"
 
 
+void stopExecution();
 void startMachine();
 void stopMachine();
 
 void setup() {
+    
     Serial.begin(115200);
+    initLCD();
 
-    ESPWifi wifi(WIFI_SSID, WIFI_PASSWORD);
-    Serial.printf("Connecting to %s...", WIFI_SSID);
+    ESPWifi wifi(WIFI_SSID, WIFI_PASSWORD);    
+    displayLCD("Connecting to",
+                WIFI_SSID.c_str());
+
     while (!wifi.isConnect()) {
-        Serial.print(".");
         delay(1000);
 
         if (!wifi.isSuccess()) {
             Serial.printf("\nError connecting to %s...\n", WIFI_SSID);
+            displayLCD("Network Error :<",
+                       "Please try again");
         }
     }
 
     if (wifi.isConnect()) {
+        displayLCD(" WIFI Connected ",
+                    "Happy Extruding!!"); 
 
         if (http.createMachine()){
             sensor = http.createSensors();
-            Serial.println("\nSuccessfully created machine instance...\n");
-        } else {
-            Serial.println("\nDuplicate instance of machine...\n");
         }
 
         pinMode(BTN_START, INPUT_PULLUP);
         pinMode(BTN_STOP, INPUT_PULLUP);
+        pinMode(IR_PIN, INPUT);
 
         pinMode(LED_GREEN, OUTPUT);
         pinMode(LED_YELLOW, OUTPUT);
@@ -41,86 +48,84 @@ void setup() {
 
         attachInterrupt(digitalPinToInterrupt(BTN_STOP), 
             stopMachine, RISING);
+    }
 
 
-        sensor.is_start = false;
-        sensor.is_initialize = false;
-        sensor.is_stop = false;
-        sensor.counter = 0;
-        sensor.time = 0;       
+    digitalWrite(RELAY_MODULE, LOW);
 
-        digitalWrite(RELAY_MODULE, LOW); 
-    }   
+    digitalWrite(LED_GREEN, HIGH);
+    digitalWrite(LED_YELLOW, HIGH);
+    digitalWrite(LED_RED, HIGH); 
+    delay(2000);
+
+    digitalWrite(LED_GREEN, LOW);
+    digitalWrite(LED_YELLOW, LOW);
+    digitalWrite(LED_RED, LOW); 
+    delay(2000);
 }
 
 void loop() {
 
-    
     if (WiFi.status() != WL_CONNECTED) {
-        Serial.printf("No wifi connected...\n");
+        displayLCD("Network Issue :(",
+                    "Low Signal Rate!");
         return;
     }
 
     sensor = http.retrieveSensors();
 
-    if (machine_state.equals(STOP) || sensor.is_stop) {
-        Serial.println("Machine has stopped");
-        
-        sensor.is_start = false;
-        sensor.is_stop = false;
-        sensor.is_initialize = false;
-        sensor.counter = 0;
-        sensor.time = 0;
-
-        machine_state = NONE;
-        
-        digitalWrite(LED_YELLOW, LOW);
-        digitalWrite(LED_GREEN, LOW);
-        digitalWrite(LED_RED, HIGH);
-
-        digitalWrite(RELAY_MODULE, LOW);
-
-        http.updateSensors(sensor);
-        // http.createNotifications(
-        //     "",
-        //     ""
-        // );
-        
-        digitalWrite(LED_RED, LOW);
+    if (machine_state.equals(STOP) || sensor.is_stop ) {
+        stopExecution();
         return;
     }
 
-    if (sensor.is_start && sensor.is_initialize) {
-        Serial.println("Waiting for button pressed");
-        sensor.temperature = thermo.readCelsius();   
-        Serial.println(sensor.temperature);
+    if (sensor.is_initialize && sensor.is_start) {
+        digitalWrite(LED_YELLOW, HIGH);
+        displayLCD("To Start, Press ",
+                    "White Button -->");
 
-        if (machine_state.equals(NONE)){
-            Serial.println("YELLOW IS ON");
-            digitalWrite(LED_YELLOW, HIGH);
+        if (machine_state.equals(NONE)) 
             return;
-        }
 
         if (machine_state.equals(START)) {
-
-            Serial.println("Machine has started");
-
             digitalWrite(LED_YELLOW, LOW);
             digitalWrite(LED_GREEN, HIGH);
-
             digitalWrite(RELAY_MODULE, HIGH);
+        }
 
-            Sensor newSensor = http.retrieveSensors();
+        while (machine_state.equals(START)) {
+            
+            sensor = http.retrieveSensors();
+            displayLCD("  Extruding...",
+                        " Percent: " + sensor.counter);
+            
+            sensor.temperature = thermo.readCelsius();
 
-            if (newSensor.is_stop || machine_state.equals(STOP)) 
-                sensor.is_stop = newSensor.is_stop;
+            if (machine_state.equals(STOP) 
+                || sensor.is_stop
+                || (digitalRead(IR_PIN) == LOW) ) {
+                    Serial.printf("Stopping...");
+                    stopExecution();
+                    return;
+                }
 
             http.updateSensors(sensor);
-            return;
-        }
-    }
 
-    delay(10);
+            if (machine_state.equals(STOP) 
+                || sensor.is_stop
+                || (digitalRead(IR_PIN) == LOW) ) {
+                    Serial.printf("Stopping...");
+                    stopExecution();
+                    return;
+                }
+
+            delay(100);
+        }
+    } else {
+        displayLCD("Please Select an",
+                    "Option via App:>");
+    }
+    delay(100);
 }
 
 
@@ -129,7 +134,64 @@ void startMachine() {
         machine_state = START;
 }
 
+
 void stopMachine() {
     if (sensor.is_initialize && sensor.is_start)
         machine_state = STOP;
+}
+
+
+void stopExecution() {
+    char * line1 = "";
+    char * line2 = "";
+
+    if (digitalRead(IR_PIN) == LOW){
+        line1 = "Process Broken!!";
+        line2 = "Machine has Stop";
+    } else {
+        line1 = "Emergency Button";  
+        line2 = "has been Pressed"; 
+    }
+
+    displayLCD(line1, line2);
+    
+    if (sensor.is_initialize) {
+        sensor.is_initialize = false;
+    }
+
+    sensor.is_start = false;
+    sensor.is_stop = true;
+    sensor.time = 0;
+    sensor.counter = 0;  
+
+    machine_state = NONE;
+
+    digitalWrite(RELAY_MODULE, LOW);    
+    digitalWrite(LED_YELLOW, LOW);
+    digitalWrite(LED_GREEN, LOW);
+    digitalWrite(LED_RED, HIGH);
+
+    http.updateSensors(sensor);
+
+    if (digitalRead(IR_PIN) == LOW) {
+        http.createNotifications(
+            "Petamentor has stopped due to some issues.",
+            "Check and fix the machine's problems before proceeding."
+        );
+    } else {
+        http.createNotifications(
+            "Petamentor's emergency stop has been activated.",
+            "The emergency button has been pressed on the machine. Petamentor has stopped."
+        );
+    }
+
+    delay(5000);
+
+    sensor.is_stop = false;
+    http.updateSensors(sensor);
+    digitalWrite(LED_RED, LOW);
+    displayLCD("Thanks for using",
+                ">> MakerSync! <<"); 
+
+    delay(5000);
 }
