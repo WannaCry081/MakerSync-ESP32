@@ -10,6 +10,6 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 
 void initLCD();
-
+void displayLCD(const char * line1, const char* line2);
 
 #endif
