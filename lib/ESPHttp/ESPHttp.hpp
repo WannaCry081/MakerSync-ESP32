@@ -21,7 +21,7 @@ class ESPHttp {
     private:
         String _uuid;
         
-        const String _machinesUrl = "https://maker-sync-django.vercel.app/api/v2/machines";
+        const String _machinesUrl = "http://192.168.43.231:3000/api/v2/machines";
         String _sensorsUrl;
         String _notificationsUrl;
         
