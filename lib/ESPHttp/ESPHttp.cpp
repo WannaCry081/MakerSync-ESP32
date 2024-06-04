@@ -98,12 +98,13 @@ bool ESPHttp::updateSensors(Sensor sensor) {
 
 void ESPHttp::createNotifications(String title, String content) {
     HTTPClient http;
+    Serial.println(_notificationsUrl);
 
     http.addHeader("Content-Type", "application/json");
 
     String payload = "{";
-    payload += "\"is_start\":\"" + title + "\", ";
-    payload += "\"is_stop\":\"" + content + "\" ";
+    payload += "\"title\":\"" + title + "\", ";
+    payload += "\"content\":\"" + content + "\" ";
     payload += "}";
 
     http.begin(_notificationsUrl);
