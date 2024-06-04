@@ -20,8 +20,8 @@ String machine_state = NONE;
 const String UUID = "2ae09d7a-8f5d-496f-9917-4deabb3e5ad3";
 
 // Wifi credentials
-const String WIFI_SSID = "WIFI_SSID_HERE";
-const String WIFI_PASSWORD = "WIFI_PASSWORD_HERE";
+const String WIFI_SSID = "Testing";
+const String WIFI_PASSWORD = "helloworld1";
 
 // LED pins
 const byte LED_RED = 14;
@@ -39,6 +39,9 @@ const byte SO_PIN = 25;
 
 // Relay module pin
 const byte RELAY_MODULE = 33;
+
+// IR pin 
+const byte IR_PIN = 5;
 
 ESPHttp http(UUID);
 MAX6675 thermo(SCK_PIN, CS_PIN, SO_PIN);
